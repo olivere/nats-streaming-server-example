@@ -24,6 +24,8 @@ func main() {
 	if *clientID == "" {
 		*clientID = uuid.Must(uuid.NewV4()).String()
 	}
+
+	// Connect to NATS Streaming Server cluster
 	sc, err := stan.Connect(*clusterID, *clientID,
 		stan.NatsURL(*url),
 		stan.Pings(10, 5),
@@ -36,6 +38,7 @@ func main() {
 	}
 	defer sc.Close()
 
+	// Publish some messages, synchronously
 	var i int64
 	for {
 		i++
@@ -45,6 +48,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+		// Sleep for a random time of up to 1s
 		time.Sleep(time.Duration(rand.Int63n(1000)) * time.Millisecond)
 	}
 }

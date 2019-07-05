@@ -23,6 +23,8 @@ func main() {
 	if *clientID == "" {
 		*clientID = uuid.Must(uuid.NewV4()).String()
 	}
+
+	// Connect to NATS Streaming Server cluster
 	sc, err := stan.Connect(*clusterID, *clientID,
 		stan.NatsURL(*url),
 		stan.Pings(10, 5),
@@ -35,6 +37,8 @@ func main() {
 	}
 	defer sc.Close()
 
+	// Subscribe to the ECHO channel as a queue.
+	// Start with new messages as they come in; don't replay earlier messages.
 	sub, err := sc.QueueSubscribe("ECHO", *queueGroup, func(msg *stan.Msg) {
 		log.Printf("%10s | %s\n", msg.Subject, string(msg.Data))
 	}, stan.StartWithLastReceived())
